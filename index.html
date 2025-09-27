@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Google!</title>
+  <link rel="icon" href="https://www.google.com/favicon.ico" />
+  <meta name="description" content="A clean Google-style search interface with voice and image search." />
+  <style>
+    :root {
+      --bg-light: #ffffff;
+      --bg-dark: #202124;
+      --text-light: #000000;
+      --text-dark: #e8eaed;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background-color: var(--bg-light);
+      color: var(--text-light);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      transition: background-color 0.3s, color 0.3s;
+      opacity: 0;
+      animation: fadeIn 0.8s ease-in forwards;
+    }
+
+    @keyframes fadeIn {
+      to { opacity: 1; }
+    }
+
+    body.dark {
+      background-color: var(--bg-dark);
+      color: var(--text-dark);
+    }
+
+    .logo {
+      font-size: 60px;
+      font-weight: bold;
+      margin-bottom: 30px;
+    }
+
+    .logo span:nth-child(1) { color: #4285f4; }
+    .logo span:nth-child(2) { color: #ea4335; }
+    .logo span:nth-child(3) { color: #fbbc05; }
+    .logo span:nth-child(4) { color: #34a853; }
+    .logo span:nth-child(5) { color: #ea4335; }
+    .logo span:nth-child(6) { color: #4285f4; }
+    .logo span:nth-child(7) { color: #fbbc05; }
+
+    .logo span:hover {
+      transform: scale(1.2);
+      transition: transform 0.2s;
+    }
+
+    .search-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 600px;
+    }
+
+    .search-box {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      border-radius: 24px;
+      padding: 10px 20px;
+      backdrop-filter: blur(10px);
+      background: rgba(255, 255, 255, 0.6);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+      transition: box-shadow 0.3s;
+    }
+
+    body.dark .search-box {
+      background: rgba(32, 33, 36, 0.6);
+    }
+
+    .search-box:focus-within {
+      box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+    }
+
+    .search-box input {
+      flex: 1;
+      border: none;
+      outline: none;
+      font-size: 16px;
+      background: transparent;
+      color: inherit;
+    }
+
+    .icon-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 18px;
+      margin-left: 10px;
+      transition: transform 0.2s;
+      color: inherit;
+    }
+
+    .icon-btn:hover {
+      transform: scale(1.2);
+    }
+
+    .buttons {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .buttons button {
+      padding: 10px 16px;
+      font-size: 14px;
+      background-color: #f8f9fa;
+      border: 1px solid #f8f9fa;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: box-shadow 0.2s, background-color 0.2s;
+    }
+
+    .buttons button:hover {
+      box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+      background-color: #e8eaed;
+    }
+
+    body.dark .buttons button {
+      background-color: #303134;
+      border-color: #303134;
+      color: #e8eaed;
+    }
+
+    .status {
+      font-size: 13px;
+      color: #555;
+      margin-top: 5px;
+      height: 18px;
+    }
+
+    @media (max-width: 600px) {
+      .logo { font-size: 40px; }
+      .search-box { padding: 8px 16px; }
+      .buttons button { font-size: 12px; padding: 8px 12px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="logo" aria-label="Google logo">
+    <span>G</span><span>o</span><span>o</span><span>g</span><span>l</span><span>e</span><span>!</span>
+  </div>
+
+  <div class="search-container">
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="Ask me anything..." aria-label="Search input" />
+      <button class="icon-btn" onclick="startVoiceSearch()" aria-label="Start voice search">🎤</button>
+      <button class="icon-btn" onclick="searchByImage()" aria-label="Search by image">📷</button>
+    </div>
+
+    <div class="buttons">
+      <button onclick="searchGoogle()">Google Search</button>
+      <button onclick="feelingLucky()">I'm Feeling Lucky</button>
+    </div>
+
+    <div class="status" id="voiceStatus"></div>
+  </div>
+
+  <script>
+    function searchGoogle() {
+      const query = document.getElementById("searchInput").value.trim();
+      if (query) {
+        window.location.href = "https://www.google.com/search?q=" + encodeURIComponent(query);
+      }
+    }
+
+    function feelingLucky() {
+      const query = document.getElementById("searchInput").value.trim();
+      if (query) {
+        window.location.href = "https://www.google.com/search?q=" + encodeURIComponent(query) + "&btnI=I";
+      }
+    }
+
+    document.getElementById("searchInput").addEventListener("keydown", function(event) {
+      if (event.key === "Enter") {
+        searchGoogle();
+      }
+    });
+
+    function startVoiceSearch() {
+      const status = document.getElementById("voiceStatus");
+      if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+        status.textContent = "Voice search not supported.";
+        return;
+      }
+      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.lang = "en-IN";
+      recognition.start();
+      status.textContent = "🎙️ Listening...";
+      recognition.onresult = function(event) {
+        const transcript = event.results[0][0].transcript;
+        document.getElementById("searchInput").value = transcript;
+        status.textContent = "🔎 Searching: " + transcript;
+        searchGoogle();
+      };
+      recognition.onerror = function() {
+        status.textContent = "⚠️ Voice search failed.";
+      };
+    }
+
+    function searchByImage() {
+      window.open("https://lens.google.com/", "_blank");
+    }
+
+    // Auto dark/light mode based on system preference
+    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      document.body.classList.add("dark");
+    }
+  </script>
+</body>
+</html>
